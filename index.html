@@ -1,272 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Free AI Chat - No Keys, No Heavy Downloads</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #0f172a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: #e2e8f0;
-    }
-    .app {
-      width: 100%;
-      max-width: 600px;
-      height: 90vh;
-      display: flex;
-      flex-direction: column;
-      background: #1e293b;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-    }
-    .header {
-      padding: 0.8rem 1rem;
-      background: #0f172a;
-      border-bottom: 1px solid #334155;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-    }
-    .header span {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #38bdf8;
-    }
-    .chat-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0.8rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-    .message {
-      display: flex;
-      gap: 0.5rem;
-      max-width: 90%;
-    }
-    .message.user {
-      align-self: flex-end;
-      flex-direction: row-reverse;
-    }
-    .message.assistant {
-      align-self: flex-start;
-    }
-    .avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: #334155;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 0.7rem;
-      flex-shrink: 0;
-    }
-    .user .avatar { background: #2563eb; }
-    .assistant .avatar { background: #0d9488; }
-    .bubble {
-      padding: 0.6rem 0.8rem;
-      border-radius: 12px;
-      line-height: 1.4;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-    .user .bubble { background: #2563eb; }
-    .assistant .bubble { background: #1e293b; border: 1px solid #475569; }
-    .input-area {
-      padding: 0.6rem 1rem;
-      border-top: 1px solid #334155;
-      background: #0f172a;
-      display: flex;
-      gap: 0.5rem;
-      align-items: flex-end;
-      flex-shrink: 0;
-    }
-    .input-area textarea {
-      flex: 1;
-      background: #1e293b;
-      border: 1px solid #475569;
-      border-radius: 8px;
-      padding: 0.6rem;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      resize: none;
-      outline: none;
-      max-height: 80px;
-      min-height: 36px;
-    }
-    .input-area button {
-      background: #38bdf8;
-      border: none;
-      color: #0f172a;
-      font-weight: 600;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 0.9rem;
-    }
-    .input-area button:disabled {
-      background: #475569;
-      cursor: not-allowed;
-    }
-    .loader {
-      display: inline-flex;
-      gap: 4px;
-    }
-    .loader span {
-      width: 6px;
-      height: 6px;
-      background: #94a3b8;
-      border-radius: 50%;
-      animation: bounce 1.2s infinite ease-in-out both;
-    }
-    .loader span:nth-child(1) { animation-delay: -0.32s; }
-    .loader span:nth-child(2) { animation-delay: -0.16s; }
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant - Free & Keyless</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-height: 700px;
+        }
+
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+
+        .header h1 {
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+
+        .message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+
+        .user-message .message-content {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+
+        .bot-message .message-content {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+
+        #userInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+
+
+        #userInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+
+        #sendBtn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 100px;
+        }
+
+
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+
+        #sendBtn:active {
+            transform: translateY(0);
+        }
+
+
+        #sendBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+
+        .chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+
+        @media (max-width: 600px) {
+            .container {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .message-content {
+                max-width: 90%;
+            }
+        }
+
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite;
+        }
+
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <div class="header">
-      <span>🤖 Free AI Phone Chat</span>
-    </div>
-    <div class="chat-area" id="chatArea">
-      <div class="message assistant">
-        <div class="avatar">AI</div>
-        <div class="bubble">Hi! I'm a free, no‑key AI assistant. Ask me anything.</div>
-      </div>
-    </div>
-    <div class="input-area">
-      <textarea id="userInput" placeholder="Type a message..." rows="1" oninput="autoResize(this)"></textarea>
-      <button id="sendBtn" onclick="sendMessage()">Send</button>
-    </div>
-  </div>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Assistant</h1>
+            <p>Free AI Chat - No signup or API key required!</p>
+        </div>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <strong>AI:</strong> Hello! I'm your AI assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <textarea 
+                id="userInput" 
+                placeholder="Type your message here..." 
+                rows="3"
+            ></textarea>
+            <button id="sendBtn" onclick="sendMessage()">
+                <span id="btnText">Send</span>
+                <span id="btnLoader" class="loader" style="display: none;"></span>
+            </button>
+        </div>
+    </div>
 
-  <script>
-    // ---- Hugging Face free model (no API key required) ----
-    const API_URL = 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium';
 
-    // Conversation history – each entry is "User: ..." or "Assistant: ..."
-    let dialogue = ["Assistant: Hi! I'm a free, no‑key AI assistant. Ask me anything.\n"];
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
 
-    const chatArea = document.getElementById('chatArea');
-    const userInput = document.getElementById('userInput');
-    const sendBtn = document.getElementById('sendBtn');
 
-    function autoResize(ta) {
-      ta.style.height = 'auto';
-      ta.style.height = Math.min(ta.scrollHeight, 80) + 'px';
-    }
+        // Conversation history
+        let conversationHistory = [];
 
-    function addMessage(role, text) {
-      const div = document.createElement('div');
-      div.className = `message ${role}`;
-      div.innerHTML = `
-        <div class="avatar">${role === 'user' ? 'U' : 'AI'}</div>
-        <div class="bubble">${escapeHtml(text)}</div>
-      `;
-      chatArea.appendChild(div);
-      chatArea.scrollTop = chatArea.scrollHeight;
-    }
 
-    function escapeHtml(s) {
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+        // Enter key to send
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
 
-    async function sendMessage() {
-      const prompt = userInput.value.trim();
-      if (!prompt) return;
 
-      userInput.disabled = true;
-      sendBtn.disabled = true;
-      userInput.value = '';
-      addMessage('user', prompt);
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            conversationHistory.push({role: 'user', content: message});
+            userInput.value = '';
+            
+            // Disable button and show loader
+            sendBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-block';
+            
+            // Add typing indicator
+            const typingId = addTypingIndicator();
+            
+            try {
+                // Call AI API
+                const response = await getAIResponse(message);
+                removeTypingIndicator(typingId);
+                addMessage(response, 'bot');
+                conversationHistory.push({role: 'assistant', content: response});
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                console.error('Error:', error);
+            }
+            
+            // Re-enable button
+            sendBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoader.style.display = 'none';
+        }
 
-      // Append user turn to dialogue history
-      dialogue.push(`User: ${prompt}\nAssistant:`);
-      // Build the full prompt by joining history (DialoGPT expects this format)
-      const fullPrompt = dialogue.join('');
 
-      // Show loading indicator
-      const loadingDiv = document.createElement('div');
-      loadingDiv.className = 'message assistant';
-      loadingDiv.innerHTML = `
-        <div class="avatar">AI</div>
-        <div class="bubble"><div class="loader"><span></span><span></span><span></span></div></div>
-      `;
-      chatArea.appendChild(loadingDiv);
-      chatArea.scrollTop = chatArea.scrollHeight;
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI'}:</strong> ${escapeHtml(text)}`;
+            
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            inputs: fullPrompt,
-            parameters: {
-              max_new_tokens: 200,
-              temperature: 0.85,
-              top_p: 0.9,
-              do_sample: true,
-              return_full_text: false
-            }
-          })
-        });
 
-        if (!response.ok) {
-          const errText = await response.text();
-          throw new Error(errText || `HTTP ${response.status}`);
-        }
+        function addTypingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            messageDiv.id = 'typing-indicator';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return 'typing-indicator';
+        }
 
-        const result = await response.json();
-        // DialoGPT returns a list, take the first generated text
-        let generated = result[0]?.generated_text?.trim() || "(no response)";
 
-        // Remove loading indicator
-        loadingDiv.remove();
+        function removeTypingIndicator(id) {
+            const indicator = document.getElementById(id);
+            if (indicator) {
+                indicator.remove();
+            }
+        }
 
-        // Sometimes DialoGPT might prepend "Assistant:" or extra spaces; clean it
-        generated = generated.replace(/^Assistant:\s*/i, '').trim();
 
-        // Save and display
-        dialogue.push(` ${generated}\n`);  // the space after "Assistant:" is already in the prompt, so just add reply + newline
-        addMessage('assistant', generated);
-      } catch (error) {
-        loadingDiv.remove();
-        addMessage('assistant', `⚠️ Error: ${error.message}. Free tier may be busy – try again soon.`);
-        // Remove the incomplete assistant turn
-        dialogue.pop(); // remove the "Assistant:" we added
-      } finally {
-        userInput.disabled = false;
-        sendBtn.disabled = false;
-        userInput.focus();
-        autoResize(userInput);
-      }
-    }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
-    userInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  </script>
+
+        async function getAIResponse(message) {
+            // Using a CORS proxy with OpenAI-compatible free API
+            const API_URL = 'https://api.airforce/v1/chat/completions';
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o-mini",
+                        messages: [
+                            {
+                                role: "system",
+                                content: "You are a helpful AI assistant. Provide clear, concise, and friendly responses."
+                            },
+                            ...conversationHistory.slice(-10) // Keep last 10 messages for context
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    return data.choices[0].message.content;
+                } else {
+                    throw new Error('Unexpected response format');
+                }
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                
+                // Fallback to alternative API
+                return await getFallbackResponse(message);
+            }
+        }
+
+
+        async function getFallbackResponse(message) {
+            // Fallback using a different free API
+            try {
+                const response = await fetch('https://api.pawan.krd/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [
+                            {role: "system", content: "You are a helpful assistant."},
+                            {role: "user", content: message}
+                        ]
+                    })
+                });
+
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0]) {
+                    return data.choices[0].message.content;
+                }
+            } catch (e) {
+                console.error('Fallback error:', e);
+            }
+            
+            // Final fallback - simple responses
+            return getSimpleResponse(message);
+        }
+
+
+        function getSimpleResponse(message) {
+            const responses = {
+                'hello': 'Hello! How can I assist you today?',
+                'hi': 'Hi there! What can I help you with?',
+                'how are you': "I'm doing great, thank you for asking! How can I help you?",
+                'bye': 'Goodbye! Have a great day!',
+                'thanks': "You're welcome! Is there anything else I can help you with?",
+                'help': 'I can chat with you about various topics. Just ask me anything!'
+            };
+
+
+            const lowerMessage = message.toLowerCase();
+            
+            for (let key in responses) {
+                if (lowerMessage.includes(key)) {
+                    return responses[key];
+                }
+            }
+
+
+            return "I understand you're asking about: '" + message + "'. Could you please provide more details so I can help you better?";
+        }
+    </script>
 </body>
 </html>
