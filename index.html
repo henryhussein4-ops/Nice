@@ -1,504 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant - Free & Keyless</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 90vh;
-            max-height: 700px;
-        }
-
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-
-
-        .header h1 {
-            margin-bottom: 5px;
-            font-size: 28px;
-        }
-
-
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-
-
-        .message {
-            margin-bottom: 15px;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-
-        .message-content {
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 80%;
-            word-wrap: break-word;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-
-        .user-message .message-content {
-            background: #667eea;
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-
-        .bot-message .message-content {
-            background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-
-        .input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 10px;
-        }
-
-
-        #userInput {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            resize: none;
-            transition: border-color 0.3s;
-        }
-
-
-        #userInput:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-
-        #sendBtn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-            min-width: 100px;
-        }
-
-
-        #sendBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-
-        #sendBtn:active {
-            transform: translateY(0);
-        }
-
-
-        #sendBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-
-        .chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-
-        .chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-
-        .chat-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-
-        .chat-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-
-        @media (max-width: 600px) {
-            .container {
-                height: 100vh;
-                max-height: 100vh;
-                border-radius: 0;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .message-content {
-                max-width: 90%;
-            }
-        }
-
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 12px 16px;
-        }
-
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #667eea;
-            animation: typing 1.4s infinite;
-        }
-
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-10px);
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zee - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .header p {
+            color: #e0e0e0;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .input-container {
+            display: flex;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        #messageInput:focus {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.5);
+        }
+        
+        #sendButton {
+            margin-left: 10px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #sendButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            float: left;
+            margin: 0 2px;
+            background-color: white;
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .typing-indicator span:nth-of-type(1) {
+            animation: typing 1s infinite;
+        }
+        
+        .typing-indicator span:nth-of-type(2) {
+            animation: typing 1s infinite 0.2s;
+        }
+        
+        .typing-indicator span:nth-of-type(3) {
+            animation: typing 1s infinite 0.4s;
+        }
+        
+        @keyframes typing {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .info-box {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 15px;
+            margin: 15px;
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            border-left: 3px solid #4facfe;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .chat-container {
+                height: 400px;
+                padding: 15px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .input-container {
+                padding: 15px;
+            }
+            
+            #messageInput {
+                padding: 12px;
+            }
+            
+            #sendButton {
+                padding: 12px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🤖 AI Assistant</h1>
-            <p>Free AI Chat - No signup or API key required!</p>
-        </div>
-        
-        <div class="chat-container" id="chatContainer">
-            <div class="message bot-message">
-                <div class="message-content">
-                    <strong>AI:</strong> Hello! I'm your AI assistant. How can I help you today?
-                </div>
-            </div>
-        </div>
-        
-        <div class="input-container">
-            <textarea 
-                id="userInput" 
-                placeholder="Type your message here..." 
-                rows="3"
-            ></textarea>
-            <button id="sendBtn" onclick="sendMessage()">
-                <span id="btnText">Send</span>
-                <span id="btnLoader" class="loader" style="display: none;"></span>
-            </button>
-        </div>
-    </div>
+    <div class="container">
+        <div class="header">
+            <h1>Zee</h1>
+            <p>Your AI Assistant powered by GitHub</p>
+        </div>
+        
+        <div class="info-box">
+            <p>• Zee uses GitHub's GraphQL API to provide information</p>
+            <p>• No API keys needed for you - using GitHub PAT</p>
+            <p>• Ask about GitHub issues, repositories, or developers</p>
+        </div>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai-message">
+                Hello! I'm Zee, your AI assistant. I can help you find information about GitHub issues and repositories. What would you like to know?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Ask me anything about GitHub...">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
 
-
-    <script>
-        const chatContainer = document.getElementById('chatContainer');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const btnText = document.getElementById('btnText');
-        const btnLoader = document.getElementById('btnLoader');
-
-
-        // Conversation history
-        let conversationHistory = [];
-
-
-        // Enter key to send
-        userInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            
-            if (!message) return;
-            
-            // Add user message to chat
-            addMessage(message, 'user');
-            conversationHistory.push({role: 'user', content: message});
-            userInput.value = '';
-            
-            // Disable button and show loader
-            sendBtn.disabled = true;
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'inline-block';
-            
-            // Add typing indicator
-            const typingId = addTypingIndicator();
-            
-            try {
-                // Call AI API
-                const response = await getAIResponse(message);
-                removeTypingIndicator(typingId);
-                addMessage(response, 'bot');
-                conversationHistory.push({role: 'assistant', content: response});
-            } catch (error) {
-                removeTypingIndicator(typingId);
-                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-                console.error('Error:', error);
-            }
-            
-            // Re-enable button
-            sendBtn.disabled = false;
-            btnText.style.display = 'inline';
-            btnLoader.style.display = 'none';
-        }
-
-
-        function addMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = `<strong>${sender === 'user' ? 'You' : 'AI'}:</strong> ${escapeHtml(text)}`;
-            
-            messageDiv.appendChild(contentDiv);
-            chatContainer.appendChild(messageDiv);
-            
-            // Scroll to bottom
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-
-        function addTypingIndicator() {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message';
-            messageDiv.id = 'typing-indicator';
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = `
-                <div class="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            `;
-            
-            messageDiv.appendChild(contentDiv);
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            return 'typing-indicator';
-        }
-
-
-        function removeTypingIndicator(id) {
-            const indicator = document.getElementById(id);
-            if (indicator) {
-                indicator.remove();
-            }
-        }
-
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-
-        async function getAIResponse(message) {
-            // Using a CORS proxy with OpenAI-compatible free API
-            const API_URL = 'https://api.airforce/v1/chat/completions';
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-4o-mini",
-                        messages: [
-                            {
-                                role: "system",
-                                content: "You are a helpful AI assistant. Provide clear, concise, and friendly responses."
-                            },
-                            ...conversationHistory.slice(-10) // Keep last 10 messages for context
-                        ],
-                        max_tokens: 500,
-                        temperature: 0.7
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    return data.choices[0].message.content;
-                } else {
-                    throw new Error('Unexpected response format');
-                }
-                
-            } catch (error) {
-                console.error('API Error:', error);
-                
-                // Fallback to alternative API
-                return await getFallbackResponse(message);
-            }
-        }
-
-
-        async function getFallbackResponse(message) {
-            // Fallback using a different free API
-            try {
-                const response = await fetch('https://api.pawan.krd/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-3.5-turbo",
-                        messages: [
-                            {role: "system", content: "You are a helpful assistant."},
-                            {role: "user", content: message}
-                        ]
-                    })
-                });
-
-
-                const data = await response.json();
-                
-                if (data.choices && data.choices[0]) {
-                    return data.choices[0].message.content;
-                }
-            } catch (e) {
-                console.error('Fallback error:', e);
-            }
-            
-            // Final fallback - simple responses
-            return getSimpleResponse(message);
-        }
-
-
-        function getSimpleResponse(message) {
-            const responses = {
-                'hello': 'Hello! How can I assist you today?',
-                'hi': 'Hi there! What can I help you with?',
-                'how are you': "I'm doing great, thank you for asking! How can I help you?",
-                'bye': 'Goodbye! Have a great day!',
-                'thanks': "You're welcome! Is there anything else I can help you with?",
-                'help': 'I can chat with you about various topics. Just ask me anything!'
-            };
-
-
-            const lowerMessage = message.toLowerCase();
-            
-            for (let key in responses) {
-                if (lowerMessage.includes(key)) {
-                    return responses[key];
-                }
-            }
-
-
-            return "I understand you're asking about: '" + message + "'. Could you please provide more details so I can help you better?";
-        }
-    </script>
+    <script>
+        // GitHub PAT (provided in request)
+        const GITHUB_PAT = "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";
+        const API_URL = "https://api.github.com/graphql";
+        
+        // DOM elements
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        
+        // Function to add a message to the chat
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'ai-message');
+            messageDiv.textContent = text;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Function to show typing indicator
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Function to hide typing indicator
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+        
+        // Function to send message to GitHub API
+        async function sendMessageToGitHub(message) {
+            // GraphQL query for GitHub search
+            const query = `
+                query($queryString: String!) {
+                    search(query: $queryString, type: ISSUE, first: 10) {
+                        issueCount
+                        nodes {
+                            ... on Issue {
+                                title
+                                body
+                                author {
+                                    login
+                                }
+                                url
+                            }
+                        }
+                    }
+                }
+            `;
+            
+            const headers = {
+                "Authorization": `Bearer ${GITHUB_PAT}`,
+                "Content-Type": "application/json"
+            };
+            
+            const variables = {
+                "queryString": message
+            };
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        query: query,
+                        variables: variables
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Process the response
+                if (data.errors) {
+                    return "I encountered an issue processing your request. Try asking about GitHub issues.";
+                }
+                
+                // Extract relevant information
+                const issues = data.data.search.nodes || [];
+                
+                if (issues.length > 0) {
+                    let responseText = "Here are some GitHub issues related to your query:\n\n";
+                    for (let i = 0; i < Math.min(3, issues.length); i++) {
+                        const issue = issues[i];
+                        responseText += `- ${issue.title}\n`;
+                        if (issue.body) {
+                            responseText += `  ${issue.body.substring(0, 100)}...\n`;
+                        }
+                        responseText += `  URL: ${issue.url}\n\n`;
+                    }
+                    return responseText;
+                } else {
+                    return "I couldn't find any specific GitHub issues related to your query. Try asking for general information or more specific topics.";
+                }
+            } catch (error) {
+                console.error("GitHub API Error:", error);
+                return "Sorry, I'm having trouble connecting to GitHub right now. Please try again later.";
+            }
+        }
+        
+        // Function to handle sending messages
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            // Show typing indicator
+            showTyping();
+            
+            try {
+                // Get response from GitHub API
+                const responseText = await sendMessageToGitHub(message);
+                hideTyping();
+                
+                // Add AI response to chat
+                addMessage(responseText);
+            } catch (error) {
+                hideTyping();
+                addMessage("Sorry, I encountered an error. Please try again.");
+                console.error("Error:", error);
+            }
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initial focus on input
+        messageInput.focus();
+    </script>
 </body>
 </html>
