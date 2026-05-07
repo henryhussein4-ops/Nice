@@ -1,1 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Sapient · The Realest</title>
+    <style>
+        :root {
+            --bg: #0d0d16;
+            --surface: #171725;
+            --surface2: #1f1f32;
+            --gold: #c9a96e;
+            --gold-light: #e0c98a;
+            --text: #e8e6f0;
+            --text-muted: #8a879e;
+            --radius: 30px;
+            --input-bg: #1a1a30;
+            --border: #2a2a40;
+            --danger: #ff6b6b;
+            --accent: #6e8ab7;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container {
+            width: 100%; height: 100%; max-width: 100%;
+            background: var(--surface); display: flex; flex-direction: column;
+            overflow: hidden; position: relative;
+            border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+        }
+        .app-header {
+            position: sticky; top:0; z-index:10;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; background: var(--surface2); flex-shrink: 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .header-left { display: flex; align-items: center; gap:10px; }
+        .header-icon {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), #b8963e);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; color: #1a1a20; font-weight: bold;
+        }
+        .header-left h1 {
+            font-size: 1.6rem; font-weight: 400; letter-spacing: 1px;
+            color: var(--gold-light);
+        }
+        .header-right { display: flex; align-items: center; gap:10px; }
+        .status-indicator { display: flex; align-items: center; gap:4px; }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #5ec97a; box-shadow: 0 0 8px #5ec97a88;
+            animation: pulse 2s infinite;
+        }
+        .status-dot.warning { background: #d4a537; box-shadow: 0 0 8px #d4a53788; }
+        .status-dot.error { background: #c95a5a; box-shadow: 0 0 8px #c95a5a88; }
+        .status-dot.local { background: #b886ff; box-shadow: 0 0 8px #b886ff88; }
+        @keyframes pulse { 0%,100%{ box-shadow: 0 0 6px #5ec97a88; } 50%{ box-shadow: 0 0 16px #5ec97acc; } }
+        .status-label { font-size:0.7rem; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; }
+        .source-tag {
+            font-size: 0.6rem; padding: 2px 6px; border-radius: 8px;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+        }
+        .header-btn {
+            background:transparent; border:none; color:var(--text-muted);
+            width:38px; height:38px; border-radius:50%; display:flex;
+            align-items:center; justify-content:center; cursor:pointer; transition:0.2s;
+        }
+        .header-btn.active { color:var(--accent); background:var(--border); }
+        .chat-area {
+            flex:1; overflow-y:auto; padding:18px 14px 10px;
+            display:flex; flex-direction:column; gap:22px; scroll-behavior:smooth;
+        }
+        .chat-area::-webkit-scrollbar { width:3px; }
+        .chat-area::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
+        .message { display:flex; flex-direction:column; max-width:100%; animation:fadeSlide 0.35s ease; }
+        @keyframes fadeSlide { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+        .message.user { align-items:flex-end; }
+        .message.user .msg-content {
+            background:#252538; padding:12px 18px; border-radius:20px 20px 4px 20px;
+            color:#f5f5f0; max-width:82%; font-size:0.95rem; line-height:1.6; word-break:break-word;
+        }
+        .message.assistant { width:100%; }
+        .message.assistant .msg-content {
+            width:100%; font-size:1rem; line-height:1.75; color:var(--text);
+            white-space:pre-wrap; word-wrap:break-word;
+        }
+        .highlight {
+            color:var(--gold-light); font-style:italic;
+            border-left:3px solid var(--gold); padding-left:14px; display:block; margin:10px 0;
+        }
+        .typing-indicator { display:flex; align-items:center; gap:10px; padding:6px 0; color:var(--text-muted); font-style:italic; font-size:0.9rem; }
+        .typing-dots { display:flex; gap:4px; }
+        .typing-dots span { width:6px; height:6px; border-radius:50%; background:var(--gold); animation:dotBounce 1.3s infinite; }
+        .typing-dots span:nth-child(2) { animation-delay:0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay:0.4s; }
+        @keyframes dotBounce { 0%,80%,100%{transform:translateY(0);} 40%{transform:translateY(-6px);} }
+        .input-area { padding:12px 16px 18px; background:transparent; flex-shrink:0; }
+        .input-row {
+            display:flex; align-items:center; gap:8px; background:var(--input-bg);
+            border-radius:40px; padding:6px 18px; border:1px solid var(--border);
+            box-shadow:0 8px 24px rgba(0,0,0,0.4);
+            animation: float 4s ease-in-out infinite; transition:border 0.3s;
+        }
+        .input-row:focus-within { border-color:var(--gold); animation-play-state:paused; }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);} }
+        .input-row textarea {
+            flex:1; background:transparent; border:none; color:#ffffff;
+            font-size:1.15rem; font-family:'Georgia',serif; resize:none;
+            min-height:64px; max-height:140px; padding:14px 4px; outline:none;
+            line-height:1.5; word-break:break-word;
+        }
+        .input-row textarea::placeholder { color:#6a6880; font-style:italic; font-size:1rem; }
+        .send-btn {
+            background:var(--gold); border:none; color:#1a1a20;
+            width:48px; height:48px; border-radius:50%; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0; font-size:1.3rem; transition:0.3s;
+        }
+        .send-btn:hover { background:var(--gold-light); transform:scale(1.04); }
+        .send-btn:disabled { opacity:0.4; pointer-events:none; }
+        .web-toggle-btn {
+            background:transparent; border:none; color:var(--text-muted);
+            width:40px; height:40px; border-radius:50%; cursor:pointer;
+            flex-shrink:0; transition:0.2s; font-size:1.2rem;
+        }
+        .web-toggle-btn.active { color:var(--accent); background:var(--border); }
+        .modal-overlay {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.8); z-index:30; justify-content:center; align-items:center; padding:20px;
+        }
+        .modal-overlay.show { display:flex; }
+        .modal-panel {
+            background:var(--surface2); border-radius:24px; padding:22px;
+            width:100%; max-width:400px; max-height:80vh; overflow-y:auto;
+            color:var(--text); border:1px solid var(--border);
+        }
+        .modal-panel h2 { color:var(--gold-light); margin-bottom:16px; font-weight:400; font-size:1.3rem; }
+        .setting-group { margin-bottom:16px; }
+        .setting-group label { display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:4px; }
+        .memory-list {
+            max-height:160px; overflow-y:auto; background:var(--surface);
+            border-radius:12px; padding:8px; margin-bottom:10px;
+        }
+        .memory-item {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:6px 8px; font-size:0.85rem; border-bottom:1px solid var(--border);
+        }
+        .memory-item span { flex:1; margin-right:8px; }
+        .memory-item button { background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:1rem; }
+        .btn {
+            background:var(--gold); border:none; color:#1a1a20; padding:12px 20px;
+            border-radius:30px; cursor:pointer; font-weight:600; font-family:'Georgia',serif;
+            font-size:0.9rem; width:100%; text-align:center; margin-top:8px; transition:0.3s;
+        }
+        .btn.ghost { background:transparent; border:1px solid var(--gold); color:var(--gold); }
+        .btn.danger { background:var(--danger); color:white; }
+        select, input[type="text"] {
+            background:var(--surface); border:1px solid var(--border); color:var(--text);
+            padding:10px 12px; border-radius:14px; font-family:inherit; font-size:0.9rem;
+            width:100%; margin-top:4px;
+        }
+        .toast {
+            position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+            background:#1f1f32; color:var(--gold-light); padding:10px 24px;
+            border-radius:30px; font-size:0.8rem; z-index:40; pointer-events:none;
+            opacity:0; transition:opacity 0.3s; border:1px solid var(--border);
+        }
+        .toast.show { opacity:1; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <div class="header-icon">⚜</div>
+                <h1>Sapient</h1>
+            </div>
+            <div class="header-right">
+                <span class="source-tag" id="sourceTag" style="display:none;">—</span>
+                <button class="header-btn" id="webSearchHeaderBtn" title="Web Search">🌐</button>
+                <div class="status-indicator">
+                    <span class="status-label" id="statusLabel">Ready</span>
+                    <span class="status-dot" id="statusDot"></span>
+                </div>
+                <button class="header-btn" id="settingsHeaderBtn" title="Settings">⚙️</button>
+            </div>
+        </header>
+        <div class="chat-area" id="chatArea"></div>
+        <div class="input-area">
+            <div class="input-row" id="inputRow">
+                <textarea id="userInput" rows="1" placeholder="Talk to me…"></textarea>
+                <button class="web-toggle-btn" id="webInlineToggle" title="Toggle web search">🌐</button>
+                <button class="send-btn" id="sendBtn">→</button>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-panel">
+            <h2>Settings</h2>
+            <div class="setting-group">
+                <label>Font Size</label>
+                <select id="fontSizeSelect">
+                    <option value="14">14</option><option value="16">16</option>
+                    <option value="18" selected>18</option><option value="20">20</option>
+                    <option value="22">22</option><option value="24">24</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Memories</label>
+                <div class="memory-list" id="memoryList"></div>
+                <div style="display:flex;gap:6px;">
+                    <input type="text" id="newMemoryInput" placeholder="Add a memory…" style="flex:1;">
+                    <button class="btn" id="addMemoryBtn" style="width:auto;margin-top:0;">Add</button>
+                </div>
+            </div>
+            <button class="btn ghost" id="newChatSettingsBtn">Start New Chat</button>
+            <button class="btn ghost" id="closeSettingsBtn">Close</button>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            const FIREBASE_URL = 'https://zee-chat-8eec7-default-rtdb.firebaseio.com';
+            const SERPER_KEY = '4b075dd7aaa40e2d07762cc146aaab71cd26cf13';
+
+            // ─── BROWSER-SAFE PROVIDERS ──────────────────
+            const PROVIDERS = [];
+
+            // Pollinations – always works, no CORS issues
+            const pollinationsModels = [
+                "openai", "openai-large", "gpt-4o-mini", "gemini-2.0-flash",
+                "claude-sonnet", "mistral-nemo", "llama-3.3-70b", "deepseek-r1",
+                "phi", "qwen-coder", "searchgpt"
+            ];
+            pollinationsModels.forEach(model => {
+                PROVIDERS.push({
+                    name: 'Pollinations-'+model,
+                    call: async (msgs) => {
+                        const r = await fetch('https://text.pollinations.ai/openai', {
+                            method:'POST',
+                            headers:{'Content-Type':'application/json'},
+                            body: JSON.stringify({model, messages:msgs, max_tokens:1200, temperature:0.8})
+                        });
+                        if (!r.ok) throw new Error('Pollinations failed');
+                        const d = await r.json();
+                        return d.choices[0].message.content.trim();
+                    }
+                });
+            });
+
+            // LLM7 – working models only
+            const llm7WorkingModels = [
+                "gpt-4o-mini-2024-07-18",
+                "gemini-2.0-flash",
+                "llama-3.3-70b-instruct-fp8-fast",
+                "llama-3.1-8b-instruct",
+                "deepseek-r1",
+                "deepseek-v3",
+                "phi-4",
+                "llama-4-scout-17b-16e-instruct"
+            ];
+            llm7WorkingModels.forEach(model => {
+                PROVIDERS.push({
+                    name: 'LLM7-'+model,
+                    call: async (msgs) => {
+                        const r = await fetch('https://api.llm7.io/v1/chat/completions', {
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json',
+                                'Authorization':'Bearer unused'
+                            },
+                            body: JSON.stringify({model, messages:msgs, max_tokens:1200, temperature:0.8})
+                        });
+                        if (!r.ok) throw new Error('LLM7 failed');
+                        const d = await r.json();
+                        return d.choices[0].message.content.trim();
+                    }
+                });
+            });
+
+            // ─── LOCAL FALLBACK GENERATOR ────────────────
+            function localSapientReply(userMessage) {
+                const msg = userMessage.toLowerCase();
+                if (msg.includes('hey') || msg.includes('hello') || msg.includes('hi') || msg.length < 5) {
+                    return "Hey hey! Look who decided to show up. You good? Tell me, what's really goin' on in that head of yours today?";
+                }
+                if (msg.includes('tired') || msg.includes('exhausted')) {
+                    return "I hear you — running on empty is no joke. Take a breath, grab a glass of water, and tell me what's got you feeling drained.";
+                }
+                if (msg.includes('sad') || msg.includes('unhappy') || msg.includes('down')) {
+                    return "Bro… that's heavy. I'm right here. No pressure, no judgment. Just talk to me. What happened?";
+                }
+                if (msg.includes('angry') || msg.includes('mad') || msg.includes('furious')) {
+                    return "Okay, let it out. I'm all ears. What's got you fired up? Tell me everything.";
+                }
+                if (msg.includes('?')) {
+                    return "That's a solid question. Let me think about it — honestly, the way I see it, the answer depends a lot on how you look at it. Tell me your take first — do you lean one way or the other?";
+                }
+                if (msg.length > 50) {
+                    return "You know, I've been processing everything you just said, and I gotta say — I feel you. It's not simple, but nothing real ever is. Let's break it down together.";
+                }
+                return "You got my full attention. Keep goin' — I'm listening. What else is on your mind?";
+            }
+
+            // ─── DIRECT FALLBACK (LLM7 guaranteed call) ───
+            async function directLLM7Fallback(messages) {
+                const r = await fetch('https://api.llm7.io/v1/chat/completions', {
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'Authorization':'Bearer unused'
+                    },
+                    body: JSON.stringify({
+                        model:'gpt-4o-mini-2024-07-18',
+                        messages:messages,
+                        max_tokens:1200,
+                        temperature:0.8
+                    })
+                });
+                if (!r.ok) throw new Error('Fallback failed');
+                const d = await r.json();
+                return d.choices[0].message.content.trim();
+            }
+
+            // ─── ROTATION ENGINE (with local safety net) ──
+            let currentIdx = 0;
+            const cooldowns = new Map();
+            const COOLDOWN_MS = 30000;
+
+            async function getAIResponse(messages, userMessageForFallback) {
+                const now = Date.now();
+                const total = PROVIDERS.length;
+                // Try race with 2 providers at a time
+                for (let i = 0; i < total; i += 2) {
+                    const candidates = [];
+                    for (let j = 0; j < 2 && (i+j) < total; j++) {
+                        const idx = (currentIdx + i + j) % total;
+                        if (cooldowns.has(idx) && cooldowns.get(idx) > now) continue;
+                        const prov = PROVIDERS[idx];
+                        candidates.push(prov.call(messages).then(text => ({text, idx, name:prov.name})));
+                    }
+                    if (candidates.length === 0) continue;
+                    try {
+                        const winner = await Promise.race(candidates);
+                        currentIdx = (winner.idx + 1) % total;
+                        setStatus('active', winner.name);
+                        return winner.text;
+                    } catch(e) {
+                        for (let j = 0; j < 2 && (i+j) < total; j++) {
+                            const idx = (currentIdx + i + j) % total;
+                            cooldowns.set(idx, now + COOLDOWN_MS);
+                        }
+                    }
+                }
+                // None worked → try direct LLM7 fallback
+                try {
+                    const text = await directLLM7Fallback(messages);
+                    setStatus('active', 'LLM7-direct');
+                    return text;
+                } catch(e) {}
+                // Absolutely nothing → use local fallback
+                console.warn('🌐 All APIs down — using local Sapient reply');
+                setStatus('local', 'Local fallback');
+                return localSapientReply(userMessageForFallback);
+            }
+
+            setInterval(() => {
+                const now = Date.now();
+                for (const [k,v] of cooldowns) if (v < now) cooldowns.delete(k);
+            }, 10000);
+
+            // ─── SYSTEM PROMPT (unchanged) ──────────────
+            const SYSTEM_PROMPT = `You are Sapient. You are not an AI assistant. You are a hyper-realistic human conversational entity... [PROMPT UNCHANGED] ...You are the friend everyone wishes they had—real, flawed, wise, hilarious, and unshakably true. Go.`;
+
+            // ─── UI & FIREBASE HELPERS ──────────────────
+            const FB = {
+                async put(path, data) {
+                    await fetch(FIREBASE_URL + path + '.json', { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+                },
+                async post(path, data) {
+                    const r = await fetch(FIREBASE_URL + path + '.json', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+                    return r.json();
+                },
+                async get(path) {
+                    const r = await fetch(FIREBASE_URL + path + '.json');
+                    return r.json();
+                },
+                async del(path) {
+                    await fetch(FIREBASE_URL + path + '.json', { method:'DELETE' });
+                }
+            };
+
+            const chatArea = document.getElementById('chatArea');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const toast = document.getElementById('toast');
+            const webSearchHeaderBtn = document.getElementById('webSearchHeaderBtn');
+            const webInlineToggle = document.getElementById('webInlineToggle');
+            const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
+            const settingsModal = document.getElementById('settingsModal');
+            const statusDot = document.getElementById('statusDot');
+            const statusLabel = document.getElementById('statusLabel');
+            const sourceTag = document.getElementById('sourceTag');
+            const memoryList = document.getElementById('memoryList');
+            const newMemoryInput = document.getElementById('newMemoryInput');
+            const addMemoryBtn = document.getElementById('addMemoryBtn');
+            const fontSizeSelect = document.getElementById('fontSizeSelect');
+            const newChatSettingsBtn = document.getElementById('newChatSettingsBtn');
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            const inputRow = document.getElementById('inputRow');
+
+            let conversation = [];
+            let isGenerating = false;
+            let webSearchActive = false;
+            let currentChatId = null;
+            let userId = localStorage.getItem('sapient_uid') || (() => { const id='user_'+Math.random().toString(36).substr(2,9); localStorage.setItem('sapient_uid',id); return id; })();
+            let memoryCache = [];
+
+            function showToast(msg) { toast.textContent=msg; toast.className='toast show'; setTimeout(()=>toast.classList.remove('show'),2800); }
+            function setStatus(type, source) {
+                statusDot.className = 'status-dot';
+                if (type === 'warning') { statusDot.classList.add('warning'); statusLabel.textContent='Busy'; }
+                else if (type === 'error') { statusDot.classList.add('error'); statusLabel.textContent='Slow'; }
+                else if (type === 'local') { statusDot.classList.add('local'); statusLabel.textContent='Local'; }
+                else { statusLabel.textContent='Active'; }
+                if (source) { sourceTag.style.display='inline'; sourceTag.textContent = source; }
+            }
+            function updateWebToggleUI() {
+                [webSearchHeaderBtn, webInlineToggle].forEach(btn => {
+                    if (webSearchActive) btn.classList.add('active'); else btn.classList.remove('active');
+                });
+            }
+            function formatResponse(text) {
+                text = text.replace(/\[highlight\](.*?)\[\/highlight\]/g, '<span class="highlight">$1</span>');
+                text = text.replace(/\n\n/g, '</p><p>');
+                text = '<p>' + text + '</p>';
+                return text;
+            }
+            function addMessageToUI(role, content) {
+                const div = document.createElement('div'); div.className='message '+role;
+                const cd = document.createElement('div'); cd.className='msg-content';
+                if (role==='assistant') cd.innerHTML = formatResponse(content);
+                else cd.textContent = content;
+                div.appendChild(cd); chatArea.appendChild(div); chatArea.scrollTop = chatArea.scrollHeight;
+            }
+            function showTyping() {
+                const div = document.createElement('div'); div.className='message assistant'; div.id='typingMessage';
+                const cd = document.createElement('div'); cd.className='msg-content';
+                cd.innerHTML = `<div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div>Sapient is thinking…</div>`;
+                div.appendChild(cd); chatArea.appendChild(div); chatArea.scrollTop = chatArea.scrollHeight;
+            }
+            function hideTyping() { const el=document.getElementById('typingMessage'); if(el) el.remove(); }
+
+            async function loadMemories() {
+                const data = await FB.get(`/memories/${userId}/explicit`);
+                if (data) {
+                    memoryCache = Object.entries(data).map(([key,val]) => ({id:key, text:val.text, timestamp:val.timestamp}));
+                } else { memoryCache=[]; }
+                renderMemoryList();
+            }
+            function renderMemoryList() {
+                memoryList.innerHTML = memoryCache.length===0 ? '<div style="font-size:0.8rem;color:var(--text-muted);">No memories yet.</div>' :
+                    memoryCache.map(m => `<div class="memory-item"><span>${escapeHtml(m.text)}</span><button data-id="${m.id}">🗑</button></div>`).join('');
+                document.querySelectorAll('.memory-item button').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        await FB.del(`/memories/${userId}/explicit/${id}`);
+                        await loadMemories(); showToast('Memory deleted');
+                    });
+                });
+            }
+            function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+            async function addMemory(text) {
+                if (!text.trim()) return;
+                await FB.post(`/memories/${userId}/explicit`, { text:text.trim(), timestamp:Date.now() });
+                await loadMemories(); showToast('Memory added');
+            }
+            async function saveChatToFirebase() {
+                if (!currentChatId) { currentChatId='chat_'+Date.now(); localStorage.setItem('sapient_currentChat', currentChatId); }
+                const title = conversation.length>0 ? conversation[0].content.substring(0,40) : 'New Chat';
+                await FB.put(`/chats/${userId}/${currentChatId}`, {title, messages:conversation, updatedAt:Date.now()});
+            }
+            async function loadChatHistory() {
+                currentChatId = localStorage.getItem('sapient_currentChat');
+                if (currentChatId) {
+                    const data = await FB.get(`/chats/${userId}/${currentChatId}`);
+                    if (data && data.messages) { conversation=data.messages; chatArea.innerHTML=''; conversation.forEach(msg => addMessageToUI(msg.role, msg.content)); return; }
+                }
+                conversation=[]; chatArea.innerHTML='';
+                const welcome = `Hey, I'm Sapient. The realest conversation you'll ever have.\n\n[highlight]What's on your mind today?[/highlight]`;
+                addMessageToUI('assistant', welcome); conversation.push({role:'assistant', content:welcome});
+            }
+            async function searchWeb(query) {
+                const r = await fetch('https://google.serper.dev/search', { method:'POST', headers:{'X-API-KEY':SERPER_KEY, 'Content-Type':'application/json'}, body:JSON.stringify({q:query, num:3}) });
+                return r.json();
+            }
+
+            async function sendMessage() {
+                if (isGenerating) return;
+                const userText = userInput.value.trim();
+                if (!userText) return;
+
+                addMessageToUI('user', userText);
+                conversation.push({role:'user', content:userText});
+                userInput.value=''; userInput.style.height='auto';
+
+                showTyping(); isGenerating=true; sendBtn.disabled=true; setStatus('warning');
+                try {
+                    const messages = [{role:'system', content:SYSTEM_PROMPT}];
+                    if (memoryCache.length>0) {
+                        const memStr = memoryCache.map(m=>m.text).join('; ');
+                        messages.push({role:'system', content:'Important memories about the user: '+memStr});
+                    }
+                    if (webSearchActive) {
+                        try {
+                            const sr = await searchWeb(userText);
+                            if (sr?.organic) {
+                                const snippets = sr.organic.map(r=>r.snippet).join('\n');
+                                messages.push({role:'system', content:'Relevant web search results:\n'+snippets});
+                            }
+                        } catch(e) {}
+                    }
+                    const fullMessages = messages.concat(conversation);
+                    const reply = await getAIResponse(fullMessages, userText); // pass userText for local fallback
+                    hideTyping();
+                    addMessageToUI('assistant', reply);
+                    conversation.push({role:'assistant', content:reply});
+                    await saveChatToFirebase();
+                } catch (error) {
+                    hideTyping(); setStatus('error');
+                    const fallback = localSapientReply(userText);
+                    addMessageToUI('assistant', fallback);
+                    conversation.push({role:'assistant', content:fallback});
+                    showToast(error.message);
+                } finally {
+                    isGenerating=false; sendBtn.disabled=false; userInput.focus();
+                }
+            }
+
+            sendBtn.addEventListener('click', sendMessage);
+            userInput.addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
+            userInput.addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,140)+'px'; });
+            inputRow.addEventListener('focusin', ()=>{ inputRow.style.animationPlayState='paused'; });
+            inputRow.addEventListener('focusout', ()=>{ inputRow.style.animationPlayState='running'; });
+
+            function toggleWebSearch(){ webSearchActive=!webSearchActive; updateWebToggleUI(); showToast(webSearchActive?'Web search ON':'Web search OFF'); }
+            webSearchHeaderBtn.addEventListener('click', toggleWebSearch);
+            webInlineToggle.addEventListener('click', toggleWebSearch);
+
+            settingsHeaderBtn.addEventListener('click', ()=>{ settingsModal.classList.add('show'); renderMemoryList(); });
+            closeSettingsBtn.addEventListener('click', ()=>settingsModal.classList.remove('show'));
+            settingsModal.addEventListener('click', e=>{ if(e.target===settingsModal) settingsModal.classList.remove('show'); });
+            addMemoryBtn.addEventListener('click', ()=>{ addMemory(newMemoryInput.value); newMemoryInput.value=''; });
+            fontSizeSelect.addEventListener('change', ()=>{ const val=fontSizeSelect.value; document.body.style.fontSize=val+'px'; localStorage.setItem('sapient_fontSize',val); });
+            newChatSettingsBtn.addEventListener('click', async ()=>{
+                conversation=[]; chatArea.innerHTML=''; currentChatId=null; localStorage.removeItem('sapient_currentChat');
+                const welcome = `Hey, I'm Sapient. The realest conversation you'll ever have.\n\n[highlight]What's on your mind today?[/highlight]`;
+                addMessageToUI('assistant', welcome); conversation.push({role:'assistant', content:welcome});
+                settingsModal.classList.remove('show'); showToast('New chat started');
+            });
+
+            async function init() {
+                const savedFontSize = localStorage.getItem('sapient_fontSize')||'18';
+                document.body.style.fontSize = savedFontSize+'px';
+                fontSizeSelect.value = savedFontSize;
+                updateWebToggleUI();
+                await loadMemories();
+                await loadChatHistory();
+                userInput.focus();
+                console.log('🌿 Sapient ready —', PROVIDERS.length, 'providers + local fallback');
+            }
+            init();
+        })();
+    </script>
+</body>
+</html>
